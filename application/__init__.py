@@ -22,6 +22,8 @@ def creat_app(config_name):
 
     moment.init(app)
     login_manager.init(app)
+    login_manager.session_protection=strong
+    login_manager.login_view='auth.login'
 
     bootstrap.init_app(app)
     mail.init_app(app)
