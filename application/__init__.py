@@ -2,8 +2,8 @@ from flask import Flask
 from config import config_dev
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
-from flask_sqlalchemy import SQLALchemy
-from flask_login import LoginMnanger  
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager  
 from flask_moment import Moment
 
 
@@ -11,10 +11,10 @@ moment=Moment()
 login_manager=LoginManager()
 bootstrap=Bootstrap()
 mail=Mail()
-db=SQLALchemy()
+db=SQLAlchemy()
 
 
-def creat_app(config_name):
+def create_app(config_name):
     
     app=Flask(__name__)
     app.config.from_object(config_dev[config_name])

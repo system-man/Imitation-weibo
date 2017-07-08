@@ -1,0 +1,21 @@
+{% "base.html" %}
+
+{% block page_content %}
+<ul>[管理员]
+{% for administer in administers %}
+    <li><a href="{{ url_for('auth.admin_editprofile', id=administer.id) }}">{{ administer.name }}</a></li>
+{% endfor %}
+</ul>
+
+<ul>[助管员]
+{% for moderator in moderators %}
+    <li><a href="{{ url_for('auth.admin_editprofile',id=moderator.id) }}">{{ moderator.name }}</a></li>
+{% endfor %}
+</ul>
+
+<ul>[用户]
+{% for user in users %}
+    <li><a href="{{ url_for('auth.admin_editprofile',id=user.id) }}">{{ user.name }}</a></li>
+{% endfor %}
+</ul>
+

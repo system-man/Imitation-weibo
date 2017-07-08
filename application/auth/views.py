@@ -105,3 +105,42 @@ def edit_profile():
     return render_template('auth/editprofile.html',form=form)
 
 
+
+# 管理员对所有人资料的修改
+from ..decorator import adimin_required,permission_required
+@auth.route('/admineditprofile/<int:id>',method=['GET','POST'])
+@login_required
+@admin_required
+def admin_editprofile(id):
+    user=User.query.get_or_404(int(id))
+    form=admineditprofileForm(user)
+    if form.validate_on_submit():
+        user.email=form.email.data
+        user.username=form.username.data
+        user.confirmed=form.confirmed.data
+        user.role=Role.query.get(form.role.data)
+        user.name=form.name.data
+        user.location=form.location.data
+        user.aboutme=form.aboutme.data
+        db.session.add(user)
+        flash('The profile has been updated!')
+        return redirect(url_for('main.user',username=user.username))
+    form.email.data=user.email
+    form.username.data=user.username
+    form.confirmed.data=user.confirmed
+    form.role.data=user.role_id
+    form.name.data=user.name
+    form.location.data=user.location
+    form.aboutme.data=user.aboutme
+    return render_template('auth/admineditprofile.html',form=form,user=user)
+
+@auth.route('/allprofiles')
+@login_required
+@admin_required
+def show_all_people():
+    administers=User.query.filter_by(role_id=2).all()
+    moderators=User.query.filter_by(role_id=1).all()
+    users=User.query.filter_by(role_id=3).all()
+
+    return render_template('auth/allpeople.html', administers=administers, moderators=moderators, users=users)
+
