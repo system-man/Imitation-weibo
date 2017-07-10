@@ -71,16 +71,16 @@ class User(UserMixin, db.Model):
                 self.role=Role.query.filter_by(name='ADMINISTER').first()
             if self.role is None:
                 self.role=Role.query.filter_by(default=True).first()
-        if self.email is not None and self.avatar_hash is None:
-            self.avatar_hash=hashlib.md5(self.email.encode('utf-8')).hexdigest()
+#        if self.email is not None and self.avatar_hash is None:
+#            self.avatar_hash=hashlib.md5(self.email.encode('utf-8')).hexdigest()
 
-    def generate_hash_url(self,size=100,default='identicon',rating='g'):
-        if request.is_secure:
-            url='https://secure.gravatar.com'
-        else:
-            url='http://wwww.gravatar.com'
-        hash=self.avatar_hash or hsahlib.md5(self.email.encode('utf-8')).hexdigest()
-        return '{url}{hash}?s={size}&d={default}&r={rating}'.format(url=url,hash=hash,size=size,default=default,rating=rating)
+#    def generate_hash_url(self,size=100,default='identicon',rating='g'):
+#        if request.is_secure:
+#            url='https://secure.gravatar.com'
+#        else:
+#            url='http://wwww.gravatar.com'
+#        hash=self.avatar_hash or hsahlib.md5(self.email.encode('utf-8')).hexdigest()
+#        return '{url}{hash}?s={size}&d={default}&r={rating}'.format(url=url,hash=hash,size=size,default=default,rating=rating)
 
     def ping(self):
         self.last_seen=datetime.utcnow()

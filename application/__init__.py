@@ -18,11 +18,11 @@ def create_app(config_name):
     
     app=Flask(__name__)
     app.config.from_object(config_dev[config_name])
-    config_dev[config_name].init(app)
+    config_dev[config_name].init_app(app)
 
-    moment.init(app)
-    login_manager.init(app)
-    login_manager.session_protection=strong
+    moment.init_app(app)
+    login_manager.init_app(app)
+    login_manager.session_protection='strong'
     login_manager.login_view='auth.login'
 
     bootstrap.init_app(app)

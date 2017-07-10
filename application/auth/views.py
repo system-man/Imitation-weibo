@@ -3,14 +3,14 @@
 from . import auth
 from ..models import User,Post,Role,Permission
 from application import db
-from .forms import RegisterForm,LoginForm
+from .forms import RegisterForm,LoginForm,editprofileForm,admineditprofileForm
 from ..email import send_mail
 from flask import render_template,redirect,url_for,flash,request
-from flask_login import login_user
+from flask_login import login_user,current_user
 
 @auth.route('/register',methods=['GET','POST'])
 def register():
-    registerform=RegisterForm()
+    form=RegisterForm()
     if form.validate_on_submit():
           user=User(email=form.email.data,
                     username=form.username.data,
@@ -24,16 +24,16 @@ def register():
           send_mail(user.email,'confirm your registeration!','auth/mail/confirm',user=user,token=token)
           flash("A confirmation email has been sent to you!")
           return redirect(url_for('auth.login'))
-     return render_template('auth/register.html',form=form)            
+    return render_template('auth/register.html',form=form)            
              
     
 @auth.route('/login',methods=['GET','POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-       user=User.query.filter_by(username=form.username.data).first():
+       user=User.query.filter_by(username=form.username.data).first()
        if user is not None and user.verify_password(form.password.data):
-            login_user(user,form.remember.data)
+            login_user(user,form.remember_me.data)
             return redirect(request.args.get('next') or url_for('main.index'))
        flash("invalid password or username!")
     return render_template('auth/login.html',form=form)
@@ -59,12 +59,12 @@ def confirm(token):
 #过滤未确认的用户
 @auth.before_app_request
 def before_request():
-    if current_user.is_authenticated():
+    if current_user.is_authenticated:
        current_user.ping()
        if not current_user.confirmed and request.endpoint[:5] != 'auth.' and request.endpoint[:5] != 'static':
             return redirect(url_for('auth.unconfirmed'))
 
-@auth.route('/unconfirmed'):
+@auth.route('/unconfirmed')
 def unconfirmed():
     if current_user.is_anonymous or current_user.confirmed:
           return redirect(url_for('main.index'))
@@ -74,14 +74,14 @@ def unconfirmed():
 @login_required
 def resend_confirmation():
     token = current_user.generate_confirmation_token()
-    send_mail(currten_user.email,'confirm your registeration!','auth/mail/confirm',user=current_user,token=token)
+    send_mail(current_user.email,'confirm your registeration!','auth/mail/confirm',user=current_user,token=token)
     flash("a new confirmation email has been send to you!")
     return redirect(url_for('auth.login'))
 
 
 from flask_login import logout_user
 
-@auth.route('/logout'):
+@auth.route('/logout')
 @login_required
 def logout():
     logout_user()
@@ -107,8 +107,8 @@ def edit_profile():
 
 
 # 管理员对所有人资料的修改
-from ..decorator import adimin_required,permission_required
-@auth.route('/admineditprofile/<int:id>',method=['GET','POST'])
+from ..decorator import admin_required,permission_required
+@auth.route('/admineditprofile/<int:id>',methods=['GET','POST'])
 @login_required
 @admin_required
 def admin_editprofile(id):
@@ -143,4 +143,3 @@ def show_all_people():
     users=User.query.filter_by(role_id=3).all()
 
     return render_template('auth/allpeople.html', administers=administers, moderators=moderators, users=users)
-

@@ -1,4 +1,4 @@
-{% "base.html" %}
+{% extends "base.html" %}
 
 {% block page_content %}
 <ul>[管理员]
@@ -18,4 +18,4 @@
     <li><a href="{{ url_for('auth.admin_editprofile',id=user.id) }}">{{ user.name }}</a></li>
 {% endfor %}
 </ul>
-
+{% endblock %}
