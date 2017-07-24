@@ -61,4 +61,34 @@ class admineditprofileForm(FlaskForm):
         if field.data != self.user.username and User.query.filter_by(username=field.data).first():
             raise ValidationError("username had been used!")
 
-       
+class changepasswordForm(FlaskForm):
+      current_password=PasswordField('password',validators=[Required()])
+      new_password=PasswordField('password',validators=[Required(),EqualTo('new_password2',message="password must match")])
+      new_password2=PasswordField('password',validators=[Required()])
+      submit = SubmitField('Save')
+
+      def validate_current_password(self,field):
+          if not current_user.verify_password(field.data):
+             raise ValidationError('the current password is invalid!')
+
+class requestresetpasswordForm(FlaskForm):
+      email = StringField('email', validators=[Required(), Length(1, 64), Email()])
+      submit = SubmitField('Get resetpassword_email')
+      
+      def validate_email(self,field):
+          user = User.query.filter_by(email=field.data).first()
+          if user is None:
+               raise ValidationError('please confirm you have registered!')
+
+class resetpasswordForm(FlaskForm):
+      email = StringField('email', validators=[Required(), Length(1, 64), Email()])
+      new_password=PasswordField('password',validators=[Required(),EqualTo('new_password2',message="password must match")])
+      new_password2=PasswordField('password',validators=[Required()])
+      submit = SubmitField('Reset')
+
+      def validate_email(self,field):
+             user = User.query.filter_by(email=field.data).first()
+             if user is None:
+                raise ValidationError('the email address should be right!')
+
+                       

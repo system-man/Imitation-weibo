@@ -107,6 +107,17 @@ class User(UserMixin, db.Model):
     def load_user(user_id):
         return User.query.get(int(user_id))
 
+    def reset_password(self,token,new_password):
+       s=Serializer(current_app.config['SECRET_KEY'])
+       try:
+           data=s.loads(token)
+       except:
+           return False
+       if data.get('confirme') != self.id:
+           return False
+       self.password=new_password
+       db.session.add(self)
+       return True
 
     def generate_confirmation_token(self, expiration=3600):
        s=Serializer(current_app.config['SECRET_KEY'],expiration)

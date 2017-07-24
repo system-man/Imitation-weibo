@@ -22,7 +22,7 @@ class DevelopmentConfig(Config):
     MAIL_USE_SSL=False
     MAIL_USERNAME='jczx32yp@qq.com'
     MAIL_PASSWORD='xwbutjilfehgbjba'
-    FLASKY_MAIL_SUBJECT_PREFIX='[FLASKY]'
+    FLASKY_MAIL_SUBJECT_PREFIX="system-man's home"
     FLASKY_MAIL_SENDER='jczx32yp@qq.com'
     SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'data.sqlite')
 
