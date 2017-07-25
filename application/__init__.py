@@ -1,3 +1,4 @@
+# coding: utf-8
 from flask import Flask 
 from config import config_dev
 from flask_bootstrap import Bootstrap

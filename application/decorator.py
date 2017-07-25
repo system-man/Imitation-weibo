@@ -1,4 +1,4 @@
-# coding:utf-8
+# coding: utf-8
 from flask_login import current_user
 from .models import Permission
 from functools import wraps

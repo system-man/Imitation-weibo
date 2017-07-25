@@ -1,4 +1,4 @@
-# coding:utf-8
+# coding: utf-8
 from . import main
 from .forms import PostForm
 from flask import render_template,url_for,redirect,session,abort,request,current_app

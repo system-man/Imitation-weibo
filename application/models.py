@@ -1,4 +1,8 @@
-# coding:utf-8
+# -*- coding: utf-8 -*-
+
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 from application import db
 from flask_login import UserMixin,AnonymousUserMixin

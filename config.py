@@ -1,4 +1,4 @@
-#coding:utf-8
+# coding: utf-8
 import os
 
 basedir=os.path.abspath(os.path.dirname(__file__))
@@ -24,7 +24,9 @@ class DevelopmentConfig(Config):
     MAIL_PASSWORD='xwbutjilfehgbjba'
     FLASKY_MAIL_SUBJECT_PREFIX="system-man's home"
     FLASKY_MAIL_SENDER='jczx32yp@qq.com'
-    SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'data.sqlite')
+#    SQLALCHEMY_DATABASE_URI='sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    
+    SQLALCHEMY_DATABASE_URI= 'mysql+pymysql://root:zjy110@localhost/data_dev'
 
 config_dev={
    'development':DevelopmentConfig
