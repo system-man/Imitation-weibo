@@ -1,4 +1,5 @@
 1.Mysql 更改字符集
+    
     先切换数据库到：data_dev;
     然后查看当前数据库的编码：show variables like 'character_set_database';
     然后把它的编码转成utf8：alter database data_dev CHARACTER SET utf8;
