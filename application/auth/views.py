@@ -7,6 +7,7 @@ from .forms import RegisterForm,LoginForm,editprofileForm,admineditprofileForm,c
 from ..email import send_mail
 from flask import render_template,redirect,url_for,flash,request
 from flask_login import login_user,current_user
+from application.main import main
 
 @auth.route('/register',methods=['GET','POST'])
 def register():
@@ -54,7 +55,7 @@ def confirm(token):
        flash("you have confirmed your account!")
     else:
        flash("The confirm link is not validate")
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('main.login'))
 
 #过滤未确认的用户
 @auth.before_app_request

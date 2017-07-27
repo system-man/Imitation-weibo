@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+
+{% block page_content %}
+
+<div>
+           <a href="{{ url_for('main.index') }}">首页</a>
+</div>
+
+<img src=" ">
+<h1>{{ user.username }}</h1>
+{% if current_user.is_administer() %}
+<a class="btn btn-danger" href="{{ url_for('auth.show_all_people') }}">Edit Profile(Admin)</a>
+{% endif %}
+
+{% if current_user.is_authenticated and current_user == user %}
+<p><a href="{{ url_for('auth.edit_profile') }}">Edit your profile</a></p>
+<p><a href="{{ url_for('auth.change_password') }}">change password</a></p>
+<p><a href="{{ url_for('auth.logout') }}">logout</a></p>
+{% endif %}
+
+{% if user.location or user.name %}
+    {% if user.name %}
+       <p>Real_name:&nbsp&nbsp&nbsp{{ user.name }}</p>
+    {% endif %}
+
+    {% if user.location %}
+       <p>From::&nbsp&nbsp&nbsp&nbsp<a href="http://maps.baidu.com/?q={{ user.location }}">{{ user.location }}</a></p>
+    {% endif %}
+{% endif %}
+
+{% if current_user.can(Permission.Follow) and user != current_user %}
+    {% if not current_user.is_following(user) %}
+    <a href="{{ url_for('main.follow', username=user.username) }}"
+         class="btn btn-primary">Follow</a>
+    {% else %}
+    <a href="{{ url_for('main.unfollow', username=user.username) }}"
+         class="btn btn-default">Unfollow</a>
+    {% endif %}
+{% endif %}
+<a href="{{ url_for('main.followers', username=user.username) }}">
+    Followers: <span class="badge">{{ user.followers.count() }}</span>
+</a>
+<a href="{{ url_for('main.followed', username=user.username) }}">
+    Following: <span class="badge">{{ user.followed.count() }}</span>
+</a>
+{% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+| <span class="label label-default">Follows you</span>        
+{% endif %}
+
+<div>
+     <ul>
+     {% if endpoint=='main.followers' %}
+         <li class="active"><a href="{{ url_for('main.followers', username=user.username) }}">粉丝</a></li>
+         <li><a href="{{ url_for('main.followed', username=user.username) }}">关注</a></li>
+     {% else %}
+         <li><a href="{{ url_for('main.followers', username=user.username) }}">粉丝</a></li>
+         <li class="active"><a href="{{ url_for('main.followed', username=user.username) }}">关注</a></li>
+     {% endif %}
+     </ul>
+</div>
+
+<!-- 下方列表 -->
+<div>
+   <div>
+   <!-- 导入粉丝/关注列表 -->
+      <ul class="follows">
+      {% for follow in follows %}
+            <li>
+              <!-- 头像 -->
+              <a href="{{ url_for('main.user', username=follow.user.username) }}">
+
+                  <img src="" alt="...">
+
+              </a>
+                  <div>
+                  <!-- 昵称和发表时间 -->
+                      <div>
+                          <a href="{{ url_for('main.user', username=follow.user.username) }}">{{ follow.user.username }}</a>
+                          <span> {{ moment( follow.timestamp).fromNow() }}</span>
+                      </div>
+                  <!-- 内容 -->
+                      <div>
+                          <p>about him/her：{{ follow.user.aboutme }}</p>
+                          <p>location：{{ follow.user.location }}</p>
+                             <!-- 工具条 -->
+                             <div>
+                                {% if current_user.can(Permission.Follow) and follow.user != current_user %}
+                                     {% if current_user.is_following(follow.user) %}
+                                            <a href="{{ url_for('main.unfollow', username=follow.user.username) }}">取消关注</a>
+                                     {% else %}
+                                            <a href="{{ url_for('main.follow', username=follow.user.username) }}">关注</a>
+                                     {% endif %}
+                                {% endif %}
+                             </div>
+                      </div>
+                  </div>
+            </li>
+      {% endfor %}
+
+      </ul>
+   </div>
+</div>
+
+
+{% if pagination %}
+<div class="pagination">
+    {{ macros.pagination_widget(pagination, endpoint, username=user.username) }}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% endblock %}
+
+

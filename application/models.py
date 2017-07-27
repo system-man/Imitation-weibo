@@ -48,6 +48,17 @@ class Role(db.Model):
     def __repr__(self):
         return '<Role %r>' % self.name
 
+class Follow(db.Model):
+    """
+    关注关联表
+    """
+    __tablename__ = 'follows'
+    followed_id = db.Column(
+         db.Integer,db.ForeignKey('users.id'),primary_key=True,index=True)
+    follower_id =db.Column(
+         db.Integer,db.ForeignKey('users.id'),primary_key=True,index=True)
+    timestamp = db.Column(db.DateTime,default=datetime.utcnow)
+
 
 class User(UserMixin, db.Model):
     __tablename__= 'users'
@@ -64,9 +75,15 @@ class User(UserMixin, db.Model):
     member_since=db.Column(db.DateTime(),default=datetime.utcnow)
     last_seen=db.Column(db.DateTime(),default=datetime.utcnow)
     posts=db.relationship('Post',backref='author',lazy='dynamic')
-
-
-
+    comments=db.relationship('Comment',backref='author',lazy='dynamic')
+    followed=db.relationship(
+           'Follow',foreign_keys=[Follow.follower_id],
+           backref = db.backref('follower',lazy='joined'),
+           lazy = 'dynamic',cascade = 'all, delete-orphan')                   
+    followers=db.relationship(
+           'Follow',foreign_keys=[Follow.followed_id],
+           backref = db.backref('followed',lazy='joined'),
+           lazy = 'dynamic',cascade = 'all, delete-orphan')
 
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
@@ -75,6 +92,7 @@ class User(UserMixin, db.Model):
                 self.role=Role.query.filter_by(name='ADMINISTER').first()
             if self.role is None:
                 self.role=Role.query.filter_by(default=True).first()
+        self.follow(self)
 #        if self.email is not None and self.avatar_hash is None:
 #            self.avatar_hash=hashlib.md5(self.email.encode('utf-8')).hexdigest()
 
@@ -144,6 +162,29 @@ class User(UserMixin, db.Model):
 
     def is_administer(self):
         return self.can(Permission.Administer)
+    #关注关系的辅助方法
+    def follow(self,user):
+        if not self.is_following(user):
+           f = Follow(follower=self,followed=user)
+           db.session.add(f)
+    
+    def unfollow(self,user):
+        f = self.followed.filter_by(followed_id=user.id).first()
+        if f :
+           db.session.delete(f)
+    
+    def is_following(self,user):    #从self的关注着中，寻找user
+        return self.followed.filter_by(followed_id=user.id).first() is not None
+
+    def is_followed_by(self,user):  #从self的追随者中，寻找user
+        return self.follower.filter_by(follower_id=user.id).first() is not None
+          
+    @property
+    def followed_posts(self):
+        #获取关注用户的微博，使用@property装饰器将该方法定义为只读属性，调用时不加()
+        return Post.query.join(
+           Follow,Follow.followed_id == Post.author_id).filter(
+           Follow.follower_id == self.id)
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -156,12 +197,23 @@ class AnonymousUser(AnonymousUserMixin):
 login_manager.anonymous_user=AnonymousUser
 
 
-
-
 class Post(db.Model):
     __tablename__='posts'
     id = db.Column(db.Integer,primary_key=True)
     body=db.Column(db.Text())
     timestamp=db.Column(db.DateTime(),index=True,default=datetime.utcnow)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    comments = db.relationship('Comment',backref='post',lazy='dynamic')
 
+    
+class Comment(db.Model):
+    """
+    comments model
+    """
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    disabled = db.Column(db.Boolean,default=True)
+    body = db.Column(db.Text)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))

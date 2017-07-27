@@ -11,10 +11,10 @@ class PostForm(FlaskForm):
 
 
 
-class ComentForm(FlaskForm):
+class CommentForm(FlaskForm):
      '''
      评论表单
      '''
      body = StringField("say something~",validators=[Required()])
-     submit= SubmitField("评论")
+     submit= SubmitField("发布评论")
 

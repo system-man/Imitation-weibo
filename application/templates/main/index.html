@@ -13,6 +13,22 @@
 {{ wtf.quick_form(form) }}
 {% endif %}
 </div>
+
+<div ass="wrapper bg-white b-b">
+       {% if current_user.is_authenticated %}
+       <ul class="nav nav-pills nav-sm">
+           <li{% if not show_followed %} class="active"{% endif %}><a href="{{ url_for('main.show_all') }}">全部微博</a></li>
+           {% if current_user.is_authenticated %}
+           <li{% if show_followed %} class="active"{% endif %}><a href="{{ url_for('main.show_followed') }}">我的关注</a></li>
+           {% endif %}
+       </ul>
+       {% else %}
+       <ul class="nav nav-pills nav-sm">
+       <li class="active"><a>全部微博</a></li>
+       </ul>
+       {% endif %}
+</div>
+
 <ul class="posts">
    {% for post in posts %}
      <li class="post">
@@ -30,7 +46,9 @@
                 {% if post.body_html %}
                     {{ post.body_html | safe }}
                 {% else %}
+                    <a href="{{ url_for('main.post',id = post.id) }}">
                     {{ post.body }}
+                    </a>
                 {% endif %}
             </div>
      </li>
